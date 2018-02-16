@@ -1,6 +1,6 @@
 package ru.sbt.sandbox;
 
-public class Main {
+public class Island {
 
     public static void main(String[] args) {
 	// write your code here
