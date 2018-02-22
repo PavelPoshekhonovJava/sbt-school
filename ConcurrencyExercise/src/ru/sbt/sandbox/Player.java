@@ -29,7 +29,7 @@ public class Player implements Runnable {
             }
 
             // Определяем новую позицию
-            randomDirection = (int) Math.random()*4;
+            randomDirection = (int) (Math.random()*4);
             newX = ball.positionX;
             newY = ball.positionY;
 

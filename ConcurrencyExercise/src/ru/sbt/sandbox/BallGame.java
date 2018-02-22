@@ -19,13 +19,13 @@ import java.util.TimerTask;
 public class BallGame extends Application {
     // Model
     public static final int BALLCOUNT = 5;
-    public static final int SIZEX = 20;
-    public static final int SIZEY = 15;
+    public static final int SIZEX = 10;
+    public static final int SIZEY = 7;
 
     public GameField gameField;
 
     //View
-    public static final int BALLSIZE = 30;
+    public static final int BALLRADIUS = 30;
     public static final long VIEWSLEEP = 10;
     public List<BallView> ballViews;
 
@@ -46,7 +46,7 @@ public class BallGame extends Application {
         threads = new ArrayList<>();
 
         for (Ball ball: gameField.getBalls()) {
-            threads.add(new Thread(new Player( ball, gameField, (long) (Math.random()*1000) )));
+            threads.add(new Thread(new Player( ball, gameField, (long) (Math.random()*2000) )));
         }
     }
 
@@ -67,16 +67,15 @@ public class BallGame extends Application {
     public void CreateView(Stage primaryStage){
         Group root = new Group();
 
-        // Создаем отображение сцены
-        Scene scene = new Scene(root, gameField.sizeX * BALLSIZE, gameField.sizeY * BALLSIZE, Color.BLACK);
+        // Создаем игровое поле
+        Scene scene = new Scene(root, gameField.sizeX * BALLRADIUS*2, gameField.sizeY * BALLRADIUS*2, Color.BLACK);
 
         // Создаем отображение шаров
         ballViews = new ArrayList<>();
         for (Ball ball: gameField.getBalls()) {
             Color color = new Color(Math.random(), Math.random(), Math.random(), 1.0);
-            ballViews.add(new BallView(BALLSIZE, color, ball));
+            ballViews.add(new BallView(BALLRADIUS, color, ball));
         }
-
         root.getChildren().addAll(ballViews);
 
         primaryStage.setScene(scene);
@@ -85,19 +84,21 @@ public class BallGame extends Application {
 
     public void PrintBalls(){
         for (BallView ballView: ballViews) {
-            ballView.setCenterX(ballView.ball.positionX * ballView.getRadius());
-            ballView.setCenterY(ballView.ball.positionY * ballView.getRadius());
+            ballView.setCenterX(ballView.ball.positionX * ballView.getRadius()*2 + ballView.getRadius());
+            ballView.setCenterY(ballView.ball.positionY * ballView.getRadius()*2 + ballView.getRadius());
         }
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception{
         CreateGame();
+
         CreateView(primaryStage);
         PrintBalls();
 
         RunGame();
 
+        // Запускаем таймер отображения
         Timer timer = new java.util.Timer();
         TimerTask timerTask = new TimerTask() {
             @Override
@@ -107,6 +108,7 @@ public class BallGame extends Application {
         };
         timer.schedule(timerTask, 0, VIEWSLEEP);
 
+        // Закрываем потоки при закрытии программы
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent e) {
