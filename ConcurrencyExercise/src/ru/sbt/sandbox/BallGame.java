@@ -18,7 +18,7 @@ import java.util.TimerTask;
 
 public class BallGame extends Application {
     // Model
-    private static final int BALLCOUNT = 5;
+    private static final int BALLCOUNT = 10;
     private static final int SIZEX = 10;
     private static final int SIZEY = 7;
     private GameField gameField;
