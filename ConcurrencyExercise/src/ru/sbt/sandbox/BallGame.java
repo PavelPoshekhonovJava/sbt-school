@@ -18,53 +18,52 @@ import java.util.TimerTask;
 
 public class BallGame extends Application {
     // Model
-    public static final int BALLCOUNT = 5;
-    public static final int SIZEX = 10;
-    public static final int SIZEY = 7;
-
-    public GameField gameField;
+    private static final int BALLCOUNT = 5;
+    private static final int SIZEX = 10;
+    private static final int SIZEY = 7;
+    private GameField gameField;
 
     //View
-    public static final int BALLRADIUS = 30;
-    public static final long VIEWSLEEP = 10;
-    public List<BallView> ballViews;
+    private static final int BALLRADIUS = 30;
+    private static final long VIEWSLEEP = 10;
+    private List<BallView> ballViews;
 
     // Controller
-    public List<Thread> threads;
+    private List<Thread> threads;
 
 
-    public void CreateGame(){
+    private void CreateGame(){
         // Создаем игровое поле
         gameField = new GameField(SIZEX, SIZEY);
 
-        // Добавляем шары
+        // Добавляем шары на игровое поле
         for (int i = 0; i < BALLCOUNT; i++){
             gameField.AddBall();
         }
 
         // Создаем поток для каждого шара
         threads = new ArrayList<>();
-
-        for (Ball ball: gameField.getBalls()) {
+        for (Ball ball: gameField.balls) {
             threads.add(new Thread(new Player( ball, gameField, (long) (Math.random()*2000) )));
         }
     }
 
-    public void RunGame(){
+    private void RunGame(){
         // Запускаем потоки
         for (Thread thread: threads) {
             thread.start();
         }
     }
 
-    public void StopGame(){
+    private void StopGame() {
         // Запускаем потоки
         for (Thread thread: threads) {
             thread.interrupt();
         }
     }
 
-    public void CreateView(Stage primaryStage){
+
+    private void CreateView(Stage primaryStage){
         Group root = new Group();
 
         // Создаем игровое поле
@@ -72,22 +71,25 @@ public class BallGame extends Application {
 
         // Создаем отображение шаров
         ballViews = new ArrayList<>();
-        for (Ball ball: gameField.getBalls()) {
+        for (Ball ball: gameField.balls) {
             Color color = new Color(Math.random(), Math.random(), Math.random(), 1.0);
-            ballViews.add(new BallView(BALLRADIUS, color, ball));
+            Circle circle = new Circle(BALLRADIUS, color);
+
+            ballViews.add(new BallView(ball, circle));
+            root.getChildren().add(circle);
         }
-        root.getChildren().addAll(ballViews);
 
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    public void PrintBalls(){
+    private void PrintBalls(){
+        // Отображаем все шары
         for (BallView ballView: ballViews) {
-            ballView.setCenterX(ballView.ball.positionX * ballView.getRadius()*2 + ballView.getRadius());
-            ballView.setCenterY(ballView.ball.positionY * ballView.getRadius()*2 + ballView.getRadius());
+            ballView.ShowBall();
         }
     }
+
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -99,14 +101,15 @@ public class BallGame extends Application {
         RunGame();
 
         // Запускаем таймер отображения
-        Timer timer = new java.util.Timer();
-        TimerTask timerTask = new TimerTask() {
+        Timer timerView = new java.util.Timer();
+        TimerTask timerViewTask = new TimerTask() {
             @Override
             public void run() {
                 PrintBalls();
             }
         };
-        timer.schedule(timerTask, 0, VIEWSLEEP);
+        timerView.schedule(timerViewTask, 0, VIEWSLEEP);
+
 
         // Закрываем потоки при закрытии программы
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
