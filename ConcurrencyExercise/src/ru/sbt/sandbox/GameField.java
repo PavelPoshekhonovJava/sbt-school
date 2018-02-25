@@ -1,7 +1,9 @@
 package ru.sbt.sandbox;
 
 import java.awt.*;
+import java.io.IOException;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class GameField {
@@ -12,32 +14,24 @@ public class GameField {
     GameField(int sizeX, int sizeY) {
         this.sizeX = sizeX;
         this.sizeY = sizeY;
-        balls = new HashSet<>();
+        balls = new LinkedHashSet<>();
     }
 
 
-    private synchronized boolean isCoordInsideField(int x, int y) {
+    private boolean isPositionInsideField(int x, int y) {
         return (x >= 0) && (x < sizeX) && (y >= 0) && (y < sizeY);
     }
 
-    private boolean isCoordOccupied(int x, int y) {
+    private boolean isPositionOccupied(int x, int y) {
         for (Ball ball: balls) {
-            if ((ball.positionX == x) && (ball.positionY == y))
-                return true;
-        }
-        return false;
-    }
-
-    private boolean isCoordOccupied(int x, int y, Ball selfBall) {
-        for (Ball ball: balls) {
-            if ((!ball.equals(selfBall)) && (ball.positionX == x) && (ball.positionY == y))
+            if (ball.IsMyPosition(x, y))
                 return true;
         }
         return false;
     }
 
 
-    public synchronized boolean AddBall() {
+    public synchronized void AddBall() {
         int x;
         int y;
         int cyclingProtector = 0;
@@ -46,36 +40,39 @@ public class GameField {
             x = (int) (Math.random() * sizeX);
             y = (int) (Math.random() * sizeY);
             cyclingProtector++;
-        } while ((isCoordOccupied(x, y)) && (cyclingProtector <= 300));
+        } while ((isPositionOccupied(x, y)) && (cyclingProtector <= 300));
 
-        if (isCoordOccupied(x, y))
-            return false;
-
-        balls.add(new Ball(x, y));
-        return true;
+        if (!isPositionOccupied(x, y)) {
+            balls.add(new Ball(x, y, balls.size()+1));
+        }
     }
 
     public synchronized void MoveBall(Ball ballToMove) {
         Point newPos;
-        newPos = ballToMove.CalcNewPosition((int) (Math.random()*4));
+        int rndDirection;
+
+        // Сначала пробуем переместить в случайном направлении
+        rndDirection = (int) (Math.random()*4);
+        newPos = ballToMove.CalcNewPosition(rndDirection);
 
         // Если позиция корректная - делаем ход
         if (CheckPosAndMakeMove(newPos.x, newPos.y, ballToMove))
             return;
 
-        for (int i = 0; i < 4; i++) {
+        // Если в случайном направлении не переместились - перебираем все направления
+        for (int i = rndDirection + 1; i < rndDirection + 4; i++) {
             newPos = ballToMove.CalcNewPosition(i);
 
-            CheckPosAndMakeMove(newPos.x, newPos.y, ballToMove);
+            if (CheckPosAndMakeMove(newPos.x, newPos.y, ballToMove))
+                return;
         }
-
     }
 
     private boolean CheckPosAndMakeMove(int x, int y, Ball ballToMove) {
         // Если позиция корректная - делаем ход
-        if (isCoordInsideField(x, y) && !isCoordOccupied(x, y, ballToMove)) {
-            ballToMove.positionX = x;
-            ballToMove.positionY = y;
+        if (isPositionInsideField(x, y) && !isPositionOccupied(x, y)) {
+            ballToMove.setPositionX(x);
+            ballToMove.setPositionY(y);
 
             return true;
         }

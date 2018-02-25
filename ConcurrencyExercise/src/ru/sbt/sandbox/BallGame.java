@@ -18,17 +18,19 @@ import java.util.TimerTask;
 
 public class BallGame extends Application {
     // Model
-    private static final int BALLCOUNT = 10;
-    private static final int SIZEX = 10;
-    private static final int SIZEY = 7;
+    private static final int BALLCOUNT = 7;
+    static final int SIZEX = 5;
+    static final int SIZEY = 5;
     private GameField gameField;
 
-    //View
-    private static final int BALLRADIUS = 30;
-    private static final long VIEWSLEEP = 10;
+    // View
+    static final int BALLRADIUS = 30;
+    private static final long VIEWSLEEP = 500;
     private List<BallView> ballViews;
 
     // Controller
+    private static final int BALLSPEEDLO = 500;
+    private static final int BALLSPEEDHI = 50;
     private List<Thread> threads;
 
 
@@ -44,7 +46,8 @@ public class BallGame extends Application {
         // Создаем поток для каждого шара
         threads = new ArrayList<>();
         for (Ball ball: gameField.balls) {
-            threads.add(new Thread(new Player( ball, gameField, (long) (Math.random()*2000) )));
+            long timeToSleepMs = (long) (BALLSPEEDHI + Math.random()* (BALLSPEEDLO - BALLSPEEDHI));
+            threads.add(new Thread(new Player( ball, gameField, timeToSleepMs )));
         }
     }
 
@@ -88,6 +91,7 @@ public class BallGame extends Application {
         for (BallView ballView: ballViews) {
             ballView.ShowBall();
         }
+        System.out.println();
     }
 
 
@@ -116,6 +120,7 @@ public class BallGame extends Application {
             @Override
             public void handle(WindowEvent e) {
                 StopGame();
+
                 Platform.exit();
                 System.exit(0);
             }
