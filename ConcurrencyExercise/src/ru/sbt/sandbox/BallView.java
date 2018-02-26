@@ -3,8 +3,8 @@ package ru.sbt.sandbox;
 import javafx.scene.shape.Circle;
 
 public class BallView {
-    Ball ball;
-    Circle circle;
+    private Ball ball;
+    private Circle circle;
 
     public BallView(Ball ball, Circle circle) {
         this.ball = ball;
@@ -12,9 +12,6 @@ public class BallView {
     }
 
     public synchronized void ShowBall() {
-        circle.setCenterX(ball.getPositionX() * circle.getRadius()*2 + circle.getRadius());
-        circle.setCenterY(ball.getPositionY() * circle.getRadius()*2 + circle.getRadius());
-
-        System.out.println(ball + " Отображение: " + circle);
+        circle.relocate(ball.getPositionX() * circle.getRadius()*2, ball.getPositionY() * circle.getRadius()*2);
     }
 }

@@ -6,12 +6,10 @@ import java.util.Objects;
 public class Ball {
     private int positionX;
     private int positionY;
-    private int num;
 
-    Ball(int positionX, int positionY, int num) {
+    Ball(int positionX, int positionY) {
         this.positionX = positionX;
         this.positionY = positionY;
-        this.num = num;
     }
 
 
@@ -63,28 +61,5 @@ public class Ball {
         }
 
         return new Point(newX, newY);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Ball ball = (Ball) o;
-        return positionX == ball.positionX &&
-                positionY == ball.positionY;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(positionX, positionY);
-    }
-
-    @Override
-    public String toString() {
-        return "Ball{" +
-                "num=" + num +
-                ", positionX=" + positionX +
-                ", positionY=" + positionY +
-                '}';
     }
 }

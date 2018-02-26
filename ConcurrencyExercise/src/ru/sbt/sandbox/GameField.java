@@ -1,20 +1,18 @@
 package ru.sbt.sandbox;
 
 import java.awt.*;
-import java.io.IOException;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class GameField {
     int sizeX;
     int sizeY;
-    Set<Ball> balls;
+    volatile Set<Ball> balls;
 
     GameField(int sizeX, int sizeY) {
         this.sizeX = sizeX;
         this.sizeY = sizeY;
-        balls = new LinkedHashSet<>();
+        balls = new HashSet<>();
     }
 
 
@@ -43,7 +41,7 @@ public class GameField {
         } while ((isPositionOccupied(x, y)) && (cyclingProtector <= 300));
 
         if (!isPositionOccupied(x, y)) {
-            balls.add(new Ball(x, y, balls.size()+1));
+            balls.add(new Ball(x, y));
         }
     }
 
