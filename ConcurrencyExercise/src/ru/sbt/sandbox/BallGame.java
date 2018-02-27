@@ -21,7 +21,7 @@ public class BallGame extends Application {
     private static final int BALLCOUNT = 7;
     private static final int SIZEX = 12;
     private static final int SIZEY = 7;
-    private GameField gameField;
+    private final GameField gameField = new GameField(SIZEX, SIZEY);
 
     // View
     private static final int BALLRADIUS = 30;
@@ -35,9 +35,7 @@ public class BallGame extends Application {
 
 
     private void CreateGame(){
-        // Создаем игровое поле
-        gameField = new GameField(SIZEX, SIZEY);
-
+        // Игровое поле уже создано
         // Добавляем шары на игровое поле
         for (int i = 0; i < BALLCOUNT; i++){
             gameField.AddBall();
@@ -87,11 +85,13 @@ public class BallGame extends Application {
     }
 
     private void PrintBalls(){
-        // Отображаем все шары
-        for (BallView ballView: ballViews) {
-            ballView.ShowBall();
+        synchronized(gameField) {
+            // Отображаем все шары
+            for (BallView ballView: ballViews) {
+                ballView.ShowBall();
+            }
         }
-   }
+    }
 
 
     @Override

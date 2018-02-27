@@ -11,7 +11,7 @@ public class BallView {
         this.circle = circle;
     }
 
-    public synchronized void ShowBall() {
+    public void ShowBall() {
         circle.relocate(ball.getPositionX() * circle.getRadius()*2, ball.getPositionY() * circle.getRadius()*2);
     }
 }
